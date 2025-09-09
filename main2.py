@@ -26,16 +26,17 @@ def generate_fullname():
         "Javier", "Francisco", "Jose", "Antonio"
         ]
     apellidos = [
-        "Gomez9023", "Tilin9123", "Lopez5411", "Martinez4001", "Gonzalez7982", "Perez321859", "Sanchez7913", "Diaz8923", "Romero7503"
+        "Gomez", "Tilin", "Lopez", "Martinez", "Gonzalez", "Perez", "Sanchez", "Diaz", "Romero"
         ]
     return f"{random.choice(nombres)}{random.choice(apellidos)}"
 
 # Function to generate random characters
 def generate_caracteres():
     """
-    This function generates 3 random characters from a list of letters.
+    This function generates 3 random characters from a list of letters and numbers.
     """
-    return ''.join(random.choices(string.ascii_letters, k=3))
+    # Changed the character set to include digits
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=3))
 
 # Function to generate random passwords
 def generate_password():
@@ -159,7 +160,7 @@ class AccountCreator:
         self.driver.refresh()
 
         # Check if login was successful
-        # (Replace this with the appropriate logic for your case)
+        # (Reemplaza esto con la logica adecuada para tu caso)
         WebDriverWait(self.driver, 120).until(
             EC.presence_of_element_located((
                 By.XPATH, '//*[@id="right-navigation-header"]/div[2]/ul/div[2]/a'
@@ -276,134 +277,3 @@ def menu():
                     if create.follow_user(user_id):
                         print(f"User {user['username']} has followed user {user_id}")
                         create.driver.delete_all_cookies()
-                    if not create.follow_user(user_id):
-                        print(f"User {user['username']} is already following user {user_id}")
-                        create.driver.delete_all_cookies()
-        # Quick login with an existing user
-        if opcion == "3":
-            print("Existing users: ")
-            try:
-                with open("usuarios.json", 'r', encoding='utf-8') as file:
-                    existing_users = json.load(file)
-            except FileNotFoundError:
-                existing_users = []
-            list_num = 1
-            for user in existing_users:
-                print(f"{list_num}. User: {user['username']} Used: {user['seUso']} Level: {user['nivel']}")
-                list_num += 1
-            account_index = input("Select an account: ")
-            if account_index == "" or not account_index.isdigit() or int(account_index) not in range(1, len(existing_users) + 1):
-                print("No valid number entered")
-                return
-            print("Logging in...")
-            create = AccountCreator()
-            selected_user = existing_users[int(account_index) - 1]
-            if create.login(selected_user["cookies"]):
-                print(f"User {selected_user['username']} has logged in")
-            else:
-                print(f"Error logging in with user {selected_user['username']}")
-        # Quick login and check if it's level 50+ or 50- and if a fruit was dropped
-        if opcion == "4":
-            code = input("Enter the login code: ")
-            try:
-                with open("usuarios.json", 'r', encoding='utf-8') as file:
-                    existing_users = json.load(file)
-            except FileNotFoundError:
-                existing_users = []
-            # Print unused users
-            print("\nUnused users:\n")
-            unused_users_count = 0
-            for user in existing_users:
-                if user["seUso"] == "No":
-                    unused_users_count += 1
-            # Show unused users
-            print(f"Unused users: {unused_users_count}")
-            selected_user = None
-            for user in existing_users:
-                if user["seUso"] == "No":
-                    print(f"User: {user['username']}")
-                    selected_user = user
-                    break
-            if selected_user is None:
-                print("No users available to log in.")
-                return
-            account_name = selected_user['username']
-            if account_name == "":
-                print("No account name entered")
-                return
-            print("Logging in...")
-            create = AccountCreator()
-            # Start the login process
-            if create.login(selected_user["cookies"]):
-                if create.quick_login(code):
-                    print(f"User {selected_user['username']} has logged in")
-                    if selected_user["nivel"] == "50-":
-                        ask_level = input("Is it level 50+? (yes/no): ")
-                        try:
-                            if ask_level not in ["yes", "no"]:
-                                raise ValueError("Invalid option")
-                            if ask_level == "yes":
-                                selected_user["nivel"] = "50+"
-                                selected_user["seUso"] = "Si"
-                                selected_user["ultimoUso"] = f"{time.strftime('%d/%m/%Y')} {time.strftime('%H:%M:%S')}"
-                                print(f"User {selected_user['username']} is level 50+")
-                            if ask_level == "no":
-                                selected_user["nivel"] = "50-"
-                                selected_user["seUso"] = "No"
-                                print(f"User {selected_user['username']} is level 50-")
-                        except ValueError:
-                            print("Invalid option")
-                    else:
-                        dropped_fruit = input("Did it drop a fruit? (yes/no): ")
-                        try:
-                            if dropped_fruit not in ["yes", "no"]:
-                                raise ValueError("Invalid option")
-                            if dropped_fruit == "yes":
-                                selected_user["seUso"] = "Si"
-                                selected_user["ultimoUso"] = f"{time.strftime('%d/%m/%Y')} {time.strftime('%H:%M:%S')}"
-                                print(f"User {selected_user['username']} has dropped a fruit")
-                            if dropped_fruit == "no":
-                                selected_user["seUso"] = "No"
-                                print(
-                                    f"User {selected_user['username']} has not dropped a fruit"
-                                    )
-                        except ValueError:
-                            print("Invalid option")
-
-                else:
-                    print(
-                        f"Error logging in with user {selected_user['username']}"
-                        )
-            else:
-                print(f"Error logging in with user {selected_user['username']}")
-            # Save changes to the JSON file
-            with open("usuarios.json", 'w', encoding='utf-8') as file:
-                json.dump(existing_users, file, indent=4, sort_keys=False)
-        if opcion == "5":
-            print("Checking if 2 hours have passed since the last use...\n")
-            try:
-                with open("usuarios.json", 'r', encoding='utf-8') as file:
-                    existing_users = json.load(file)
-            except FileNotFoundError:
-                existing_users = []
-            for user in existing_users:
-                last_use = user["ultimoUso"]
-                current_time_last_use = time.mktime(
-                    time.strptime(last_use, "%d/%m/%Y %H:%M:%S")
-                    )
-                current_time = time.time()
-                if current_time - current_time_last_use >= 7200:
-                    user["seUso"] = "No"
-                    print(f"User {user['username']} has had 2 hours pass since the last use")
-            # Save changes to the JSON file
-            with open("usuarios.json", 'w', encoding='utf-8') as file:
-                json.dump(existing_users, file, indent=4, sort_keys=False)
-        if opcion == "0":
-            print("Exiting...")
-            time.sleep(1)
-            exit()
-    except ValueError:
-        print("Invalid option")
-        os.system("clear")
-# Start the program
-menu()
