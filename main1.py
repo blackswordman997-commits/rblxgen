@@ -26,7 +26,7 @@ def generate_fullname():
         "Javier", "Francisco", "Jose", "Antonio"
         ]
     apellidos = [
-        "Gomez", "Tilin", "Lopez", "Martinez", "Gonzalez", "Perez", "Sanchez", "Diaz", "Romero"
+        "Gomez9023", "Tilin9123", "Lopez5411", "Martinez4001", "Gonzalez7982", "Perez321859", "Sanchez7913", "Diaz8923", "Romero7503"
         ]
     return f"{random.choice(nombres)}{random.choice(apellidos)}"
 
